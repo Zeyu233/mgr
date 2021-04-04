@@ -1,10 +1,18 @@
 const Koa = require('koa');
+const koaBody = require('koa-body');
+const { connect } = require('./db');
+const registerRoutes = require("./routers");
+const cors = require('@koa/cors')
 
 const app = new Koa();
-//通过app.use 注册中间件
-//中间件的本质上就是一个函数，每次访问url就自动调用
-//context ctx上下文-当前请求的相关信息都在里面
 
-app.listen(3000,()=>{
-    console.log('启动成功');
-});
+connect().then(() => {
+    app.use(cors());
+    app.use(koaBody()); 
+    registerRoutes(app);
+    app.listen(3000, () => {
+        console.log('启动成功');
+    });
+})
+
+
