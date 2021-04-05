@@ -11,7 +11,7 @@ connect().then(() => {
     app.use(koaBody()); 
     registerRoutes(app);
     app.listen(3000, () => {
-        console.log('启动成功');
+        console.log('3000启动成功');
     });
 })
 
