@@ -27,7 +27,7 @@ export const update = (data = {}) => {
       data,
     );
   };
-  
+// 请求详情
   export const detail = (id) => {
     return axios.get(
         `http://localhost:3000/book/detail/${id}`,

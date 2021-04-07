@@ -14,12 +14,17 @@ const routes = [
       {
         path: 'books',
         name: 'Books',
-        component: () => import(/* webpackChunkName: "Auth" */'../views/Books/index.vue'),
+        component: () => import('../views/Books/index.vue'),
       },
       {
-        path: 'users',
+        path: 'books/:id',
+        name: 'BookDetail',
+        component: () => import('../views/BookDetail/index.vue'),
+      },
+      {
+        path: 'user',
         name: 'User',
-        component: () => import(/* webpackChunkName: "Auth" */'../views/Books/index.vue'),
+        component: () => import('../views/Users/index.vue'),
       },
     ],
   },

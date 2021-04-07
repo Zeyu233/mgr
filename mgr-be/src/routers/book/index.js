@@ -7,11 +7,21 @@ const BOOK_CONST = {
     OUT: 'OUT_COUNT',
 };
 const Book = mongoose.model('Book');
+const InventoryLog = mongoose.model("InventoryLog");
 
+
+// 找到一个
+const findGoodOne = async (id) => {
+  const one = await Book.findOne({
+    _id: id,
+  }).exec();
+
+  return one;
+}
 const router = new Router({
     prefix: "/book",
 })
-
+// 新增
 router.post('/add', async (ctx) => {
     const {
         name,
@@ -39,7 +49,7 @@ router.post('/add', async (ctx) => {
         msg: '添加成功'
     };
 })
-
+// 获取列表
 router.get('/list', async (ctx) => {
     // https://aa.cc.com/user?page=2&size=20&keyword=书名#fdsafds
     const {
@@ -63,6 +73,8 @@ router.get('/list', async (ctx) => {
         .limit(size)
         .exec()
 
+    console.log(list);
+
     const total = await Book.countDocuments();
 
     ctx.body = {
@@ -76,7 +88,7 @@ router.get('/list', async (ctx) => {
         msg: '获取列表成功',
     }
 })
-
+// 按id删除
 router.delete('/:id', async (ctx) => {
     const {
       id,
@@ -93,7 +105,7 @@ router.delete('/:id', async (ctx) => {
     };
   });
 
-
+// 出入库
   router.post('/update/count', async (ctx) => {
     const {
       id,
@@ -107,9 +119,7 @@ router.delete('/:id', async (ctx) => {
     num = Number(num);
   
     // const book = await findGoodOne(id);
-    const book = await Book.findOne({
-        _id:id,
-    }).exec();
+    const book =await findGoodOne(id);
   
     if (!book) {
       ctx.body = {
@@ -140,13 +150,13 @@ router.delete('/:id', async (ctx) => {
     }
   
     const res = await book.save();
+  // 记录日志
+    const log = new InventoryLog({
+      num: Math.abs(num),
+      type,
+    });
   
-    // const log = new InventoryLog({
-    //   num: Math.abs(num),
-    //   type,
-    // });
-  
-    // log.save();
+    log.save();
   
     ctx.body = {
       data: res,
@@ -155,16 +165,14 @@ router.delete('/:id', async (ctx) => {
     };
   });
 
-
+// 更新
   router.post('/update', async (ctx) => {
     const {
       id,
       ...others
     } = ctx.request.body;
   
-    const one = await Book.findOne({
-        _id:id,
-    }).exec();
+    const one = await findGoodOne(id);
   
     // 没有找到书
     if (!one) {
@@ -191,6 +199,31 @@ router.delete('/:id', async (ctx) => {
       data: res,
       code: 1,
       msg: '保存成功',
+    };
+  });
+
+// 详情接口
+router.get('/detail/:id', async (ctx) => {
+    const {
+      id,
+    } = ctx.params;
+  
+    const one = await findGoodOne(id);
+  
+    // 没有找到书
+    if (!one) {
+      ctx.body = {
+        msg: `没有找到`,
+        code: 0,
+      };
+  
+      return;
+    }
+  
+    ctx.body = {
+      msg: '查询成功',
+      data: one,
+      code: 1,
     };
   });
 
